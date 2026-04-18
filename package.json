@@ -1,0 +1,17 @@
+{
+  "name": "ecommerce-express-ejs",
+  "version": "1.0.0",
+  "description": "Proyecto de ecommerce con Express y EJS",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.22.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

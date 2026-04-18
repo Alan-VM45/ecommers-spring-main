@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MiEcommerce</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+
+
+  <!-- Contenido de la tienda -->
+  <div id="main-content">
+
+<!-- Barra superior -->
+<header class="top-bar">
+  <div class="logo">MiE<span class="highlight">commerce</span></div>
+
+  <div class="search-container">
+  <button class="search-icon" onclick="document.querySelector('.search-bar').classList.toggle('active')">🔍</button>
+  <input type="text" placeholder="Buscar productos..." class="search-bar">
+</div>
+
+  <div class="user-profile">
+    <a href="/profile" class="cart-button">👤 <span class="highlight">Usuario</span></a>
+    <!-- Botón de carrito -->
+    <a href="/cart" class="cart-button">🛒 <span class="highlight">Carrito</span></a>
+  </div>
+</header>
+
+
+    <!-- Categorías -->
+    <nav class="categories">
+      <div class="category">📱<br>Electrónica</div>
+      <div class="category">🍔<br>Alimentos</div>
+      <div class="category">🥤<br>Bebidas</div>
+      <div class="category">👕<br>Indumentaria</div>
+      <div class="category">🎮<br>Juegos</div>
+      <div class="category">🚗<br>Automotor</div>
+      <div class="category">🏠<br>Hogar</div>
+      <div class="category">🎁<br>Otros</div>
+    </nav>
+
+    <!-- Promociones -->
+    <section class="promotions">
+      <div class="promo">🎬 50% OFF en Combo Plus - Canjeando 50.000 puntos</div>
+      <div class="promo">📺 50% OFF en HBO Max - Canjeando 50.000 puntos</div>
+    </section>
+
+    <!-- Te puede interesar -->
+    <section class="product-section">
+      <h2>Te puede interesar</h2>
+      <div class="product-grid">
+        <div class="product">
+          <a href="/product/2"><img src="/images/imagenes/thumb_70661_default_big.jpeg" alt="Producto">
+          <div>Blue Label</div>
+          <span>19.900 puntos</span></a>
+        </div>
+        <div class="product"><img src="/images/imagenes/OIP.webp"><br>Producto 2<br>12.000 puntos</div>
+        <div class="product"><img src="/images/imagenes/OIP.webp"><br>Producto 3<br>8.500 puntos</div>
+        <div class="product"><img src="/images/imagenes/OIP.webp"><br>Producto 4<br>15.000 puntos</div>
+      </div>
+    </section>
+
+    <!-- Los más pedidos -->
+    <section class="product-section">
+      <h2>Los más pedidos</h2>
+      <div class="product-grid">
+        <div class="product">
+          <a href="/product/1"><img src="/images/imagenes/coca cola.webp" alt="Coca Cola">
+          <div>Coca Cola Lata 220mL Pack x8</div>
+          <span>760 puntos</span></a>
+        </div>
+        <div class="product"> <img src="/images/imagenes/OIP.webp"><br>Producto A<br>4.200 puntos</div>
+        <div class="product"> <img src="/images/imagenes/OIP.webp"><br>Producto B<br>10.000 puntos</div>
+        <div class="product"> <img src="/images/imagenes/OIP.webp"><br>Producto C<br>3.500 puntos</div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-categories">
+        <div>📱 Electrónica</div>
+        <div>🍔 Alimentos</div>
+        <div>🥤 Bebidas</div>
+        <div>👕 Indumentaria</div>
+        <div>🎮 Juegos</div>
+        <div>🚗 Automotor</div>
+        <div>🏠 Hogar</div>
+        <div>🎁 Otros</div>
+      </div>
+      <div class="footer-bottom">
+        <p>© MiEcommerce. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+
+  </div>
+</body>
+</html>
