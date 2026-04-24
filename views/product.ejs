@@ -42,8 +42,8 @@
       <% suggestions.forEach(suggestion => { %>
         <div class="product">
           <a href="/product/<%= suggestion.id %>">
-            <img src="<%= suggestion.image %>" alt="<%= suggestion.name %>">
-            <div><%= suggestion.name %></div>
+            <img src="<%= suggestion.image %>" alt="<%= suggestion.title %>">
+            <div><%= suggestion.title %></div>
           </a>
         </div>
       <% }); %>
