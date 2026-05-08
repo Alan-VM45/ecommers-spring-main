@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title><%= title %></title>
+  <title><%= product.title %></title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -25,12 +25,12 @@
   <!-- Contenido principal del producto -->
   <main class="producto-detalle">
     <div class="imagen-producto">
-      <img src="<%= image %>" alt="<%= title %>">
+      <img src="<%= product.image %>" alt="<%= product.title %>">
     </div>
     <div class="info-producto">
-      <h1><%= title %></h1>
-      <p><%= description %></p>
-      <p><strong><%= price %> puntos</strong></p>
+      <h1><%= product.title %></h1>
+      <p><%= product.description %></p>
+      <p><strong><%= product.price %> puntos</strong></p>
       <button><a href="/cart" class="cart-button">🛒 <span class="highlight">Añadir al Carrito</span></a></button>
     </div>
   </main>

@@ -1,6 +1,7 @@
 const express = require('express');
+const session = require('express-session');
 const app = express();
-const port = 3000;
+const port = 3001;
 
 const path = require('path');
 
@@ -14,6 +15,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Middleware para parsear datos de formularios
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Middleware para sesiones
+app.use(session({
+  secret: 'tu-secreto-aqui',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 1000 * 60 * 60 * 24 } // 24 horas
+}));
 
 // Rutas
 const indexRoutes = require('./routes/index');

@@ -1,16 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const indexController = require('../controllers/indexController');
 
 // GET / - Página de login
-router.get('/', (req, res) => {
-  res.render('index');
-});
+router.get('/', indexController.getLogin);
 
-// POST /home - Procesar login (simulado)
-router.post('/home', (req, res) => {
-  // Aquí iría la lógica de autenticación
-  // Por ahora, redirigir a home
-  res.redirect('/home');
-});
+// POST /home - Procesar login
+router.post('/home', indexController.postLogin);
 
 module.exports = router;

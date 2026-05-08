@@ -15,11 +15,13 @@ function getHome(req, res) {
 
   const topProducts = productModel.getTopProducts();
   const suggestedProducts = productModel.getSuggestedProducts();
+  const popularProducts = productModel.getTopProducts();
 
   res.render('home', {
     products,
     topProducts,
     suggestedProducts,
+    popularProducts,
     search,
     category,
     cartCount: cartItemCount(req.session)
