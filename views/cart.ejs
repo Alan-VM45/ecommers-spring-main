@@ -11,64 +11,42 @@
   <div class="carrito">
     <h2>Productos en tu Carrito</h2>
 
-    <!-- Producto 1 -->
-    <div class="item-carrito">
-      <img src="/images/imagenes/thumb_70661_default_big.jpeg" alt="Blue Label">
-      <div class="info">
-        <p><strong>Blue Label whisky 750ml</strong></p>
-        <div class="controles">
-          <button class="quitar">Quitar</button>
-          <div class="cantidad">
-            <button>-</button>
-            <span>1</span>
-            <button>+</button>
-          </div>
-          <span class="precio">19.900</span>
-        </div>
+    <% if (error) { %>
+      <div class="errors">
+        <p class="error"><%= error %></p>
       </div>
-    </div>
+    <% } %>
 
-    <!-- Producto 2 -->
-    <div class="item-carrito">
-      <img src="/images/imagenes/Combo-fernet-jpg.webp" alt="Combo Fernet">
-      <div class="info">
-        <p><strong>1 Combo Fernet 750ml + 2 Coca Cola 1,75L</strong></p>
-        <div class="controles">
-          <button class="quitar">Quitar</button>
-          <div class="cantidad">
-            <button>-</button>
-            <span>4</span>
-            <button>+</button>
+    <% if (!cart || cart.length === 0) { %>
+      <p>Tu carrito está vacío.</p>
+    <% } else { %>
+      <% cart.forEach(item => { %>
+        <div class="item-carrito">
+          <img src="<%= item.product.image %>" alt="<%= item.product.title %>">
+          <div class="info">
+            <p><strong><%= item.product.title %></strong></p>
+            <div class="controles">
+              <form action="/cart/remove/<%= item.id %>" method="POST" style="display:inline-block;">
+                <button type="submit" class="quitar">Quitar</button>
+              </form>
+              <form action="/cart/update/<%= item.id %>" method="POST" class="cantidad">
+                <button type="submit" name="quantity" value="<%= item.quantity - 1 %>">-</button>
+                <span><%= item.quantity %></span>
+                <button type="submit" name="quantity" value="<%= item.quantity + 1 %>">+</button>
+              </form>
+              <span class="precio"><%= item.subtotal.toLocaleString() %></span>
+            </div>
           </div>
-          <span class="precio">40.800</span>
         </div>
+      <% }); %>
+
+      <div class="total">
+        <span>Total de puntos</span>
+        <strong><%= total.toLocaleString() %></strong>
       </div>
-    </div>
 
-    <!-- Producto 3 -->
-    <div class="item-carrito">
-      <img src="/images/imagenes/coca cola.webp" alt="Coca-Cola Pack x6">
-      <div class="info">
-        <p><strong>Coca Cola Lata 220ml Pack Original x6</strong></p>
-        <div class="controles">
-          <button class="quitar">Quitar</button>
-          <div class="cantidad">
-            <button>-</button>
-            <span>1</span>
-            <button>+</button>
-          </div>
-          <span class="precio">6.000</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Total -->
-    <div class="total">
-      <span>Total de puntos</span>
-      <strong>42.100</strong>
-    </div>
-
-    <a href="#" class="pagar">Ir a pagar</a>
+      <a href="#" class="pagar">Ir a pagar</a>
+    <% } %>
   </div>
 </body>
 </html>

@@ -1,3 +1,4 @@
+const productModel = require('../models/productModel');
 const {
   addToCart,
   removeFromCart,
@@ -6,21 +7,39 @@ const {
   cartItemCount
 } = require('../models/cartModel');
 
+function buildCartItems(session) {
+  const rawCart = getCart(session);
+  return rawCart.map((item) => {
+    const product = productModel.getProductById(item.id);
+    return {
+      ...item,
+      product,
+      subtotal: product ? product.price * item.quantity : 0
+    };
+  });
+}
+
 function getCartPage(req, res) {
-  const cart = getCart(req.session);
+  const cartItems = buildCartItems(req.session);
+  const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
+
   res.render('cart', {
-    cart,
+    cart: cartItems,
     cartCount: cartItemCount(req.session),
+    total,
     error: null
   });
 }
 
 function postAddToCart(req, res) {
-  const result = addToCart(req.session, req.params.id);
+  const result = addToCart(req.session, Number(req.params.id));
   if (result.error) {
+    const cartItems = buildCartItems(req.session);
+    const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
     return res.render('cart', {
-      cart: getCart(req.session),
+      cart: cartItems,
       cartCount: cartItemCount(req.session),
+      total,
       error: result.error
     });
   }
@@ -29,18 +48,21 @@ function postAddToCart(req, res) {
 }
 
 function postRemoveFromCart(req, res) {
-  removeFromCart(req.session, req.params.id);
+  removeFromCart(req.session, Number(req.params.id));
   res.redirect('/cart');
 }
 
 function postUpdateQuantity(req, res) {
   const quantity = Number(req.body.quantity);
-  const result = updateQuantity(req.session, req.params.id, quantity);
+  const result = updateQuantity(req.session, Number(req.params.id), quantity);
 
   if (result.error) {
+    const cartItems = buildCartItems(req.session);
+    const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
     return res.render('cart', {
-      cart: getCart(req.session),
+      cart: cartItems,
       cartCount: cartItemCount(req.session),
+      total,
       error: result.error
     });
   }

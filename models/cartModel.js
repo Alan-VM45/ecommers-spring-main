@@ -10,7 +10,7 @@ function getCart(session) {
 }
 
 function addToCart(session, productId, quantity = 1) {
-  if (!session) return;
+  if (!session) return { error: 'No se pudo acceder a la sesión.' };
   if (!session.cart) session.cart = [];
 
   const item = session.cart.find((entry) => entry.id === productId);
@@ -19,6 +19,8 @@ function addToCart(session, productId, quantity = 1) {
   } else {
     session.cart.push({ id: productId, quantity });
   }
+
+  return { success: true };
 }
 
 function removeFromCart(session, productId) {
@@ -26,9 +28,28 @@ function removeFromCart(session, productId) {
   session.cart = session.cart.filter((item) => item.id !== productId);
 }
 
+function updateQuantity(session, productId, quantity) {
+  if (!session) return { error: 'No se pudo acceder a la sesión.' };
+  if (!session.cart) session.cart = [];
+
+  const item = session.cart.find((entry) => entry.id === productId);
+  if (!item) {
+    return { error: 'Producto no encontrado en el carrito.' };
+  }
+
+  if (quantity <= 0) {
+    removeFromCart(session, productId);
+    return { success: true };
+  }
+
+  item.quantity = quantity;
+  return { success: true };
+}
+
 module.exports = {
   cartItemCount,
   getCart,
   addToCart,
-  removeFromCart
+  removeFromCart,
+  updateQuantity
 };
