@@ -2,7 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const app = express();
-const port = 3001; // Mantengo el puerto de la rama prueba
+const port = 3000; // Mantengo el puerto de la rama prueba
 
 // Configurar EJS como motor de plantillas
 app.set('view engine', 'ejs');
@@ -53,5 +53,5 @@ app.use((req, res, next) => {
 
 // Iniciar servidor
 app.listen(port, () => {
-  console.log(`Servidor corriendo en http://localhost:${port}`);
+    console.log(`Servidor corriendo en http://localhost:${port}`);
 });

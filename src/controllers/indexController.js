@@ -31,7 +31,14 @@ function postLogin(req, res) {
   res.redirect('/home');
 }
 
+function getProfile(req, res) {
+  res.render('profile', {
+    cartCount: cartItemCount(req.session)
+  });
+}
+
 module.exports = {
   getLogin,
-  postLogin
+  postLogin,
+  getProfile
 };
