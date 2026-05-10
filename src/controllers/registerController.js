@@ -1,37 +1,39 @@
 const { cartItemCount } = require('../models/cartModel');
+// Podrías importar un userService aquí si quieres persistir en JSON, 
+// por ahora mantengo la lógica del usuario con las validaciones del Sprint 2.
 
 function getRegister(req, res) {
   res.render('register', {
     errors: [],
-    username: '',
-    email: '',
+    oldData: {},
     cartCount: cartItemCount(req.session)
   });
 }
 
 function postRegister(req, res) {
   const { username, email, password } = req.body;
-  const errors = [];
+  const errors = {};
 
+  // Validaciones del Sprint 2 (US #3)
   if (!username || username.trim().length < 3) {
-    errors.push('El nombre de usuario debe tener al menos 3 caracteres.');
+    errors.username = 'El nombre de usuario debe tener al menos 3 caracteres.';
   }
   if (!email || !email.includes('@')) {
-    errors.push('Debes ingresar un correo válido.');
+    errors.email = 'Debes ingresar un correo válido.';
   }
-  if (!password || password.length < 6) {
-    errors.push('La contraseña debe tener al menos 6 caracteres.');
+  if (!password || password.length < 8) {
+    errors.password = 'La contraseña debe tener al menos 8 caracteres.';
   }
 
-  if (errors.length > 0) {
+  if (Object.keys(errors).length > 0) {
     return res.render('register', {
       errors,
-      username,
-      email,
+      oldData: req.body,
       cartCount: cartItemCount(req.session)
     });
   }
 
+  // Si todo está bien, simulamos el registro
   req.session.user = { username, email };
   res.redirect('/');
 }
