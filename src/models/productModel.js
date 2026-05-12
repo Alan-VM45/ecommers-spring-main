@@ -40,7 +40,17 @@ function getProductsByCategory(category) {
 
 function getTopProducts() {
   const products = getAllProducts();
-  return products.filter((product) => product.top);
+  const topProducts = products.filter((product) => product.top);
+  
+  if (topProducts.length >= 10) {
+    return topProducts.slice(0, 10);
+  }
+  
+  // Si hay menos de 10, completar con aleatorios que no estén ya en la lista
+  const otherProducts = products.filter((product) => !product.top);
+  const shuffledOthers = otherProducts.sort(() => 0.5 - Math.random());
+  
+  return [...topProducts, ...shuffledOthers].slice(0, 10);
 }
 
 function getSuggestedProducts(product) {

@@ -70,7 +70,7 @@
         <% popularProducts.forEach(product => { %>
           <div class="product">
             <a href="/product/<%= product.id %>">
-              <img src="<%= product.image %>" alt="<%= product.title %>">
+              <img src="<%= product.image || '/images/imagenes/fallback.png' %>" alt="<%= product.title %>">
               <div><%= product.title %></div>
               <span><%= product.price %> puntos</span>
             </a>
