@@ -109,6 +109,8 @@ body {
   text-align: center;
   margin: 10px;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 /* Botón de carrito */
 .cart-button {

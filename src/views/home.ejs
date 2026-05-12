@@ -32,14 +32,14 @@
 
     <!-- Categorías -->
     <nav class="categories">
-      <div class="category">📱<br>Electrónica</div>
-      <div class="category">🍔<br>Alimentos</div>
-      <div class="category">🥤<br>Bebidas</div>
-      <div class="category">👕<br>Indumentaria</div>
-      <div class="category">🎮<br>Juegos</div>
-      <div class="category">🚗<br>Automotor</div>
-      <div class="category">🏠<br>Hogar</div>
-      <div class="category">🎁<br>Otros</div>
+      <a href="/categories/electronica" class="category">📱<br>Electrónica</a>
+      <a href="/categories/alimentos" class="category">🍔<br>Alimentos</a>
+      <a href="/categories/bebidas" class="category">🥤<br>Bebidas</a>
+      <a href="/categories/indumentaria" class="category">👕<br>Indumentaria</a>
+      <a href="/categories/juegos" class="category">🎮<br>Juegos</a>
+      <a href="/categories/automotor" class="category">🚗<br>Automotor</a>
+      <a href="/categories/hogar" class="category">🏠<br>Hogar</a>
+      <a href="/categories/otros" class="category">🎁<br>Otros</a>
     </nav>
 
     <!-- Promociones -->
@@ -53,7 +53,7 @@
       <div class="product-grid">
         <% suggestedProducts.forEach(product => { %>
           <div class="product">
-            <a href="/product/<%= product.id %>">
+            <a href="/products/<%= product.id %>">
               <img src="<%= product.image || '/images/imagenes/fallback.png' %>" alt="<%= product.title %>">
               <div><%= product.title %></div>
               <span><%= product.price %> puntos</span>
@@ -69,7 +69,7 @@
       <div class="product-grid">
         <% popularProducts.forEach(product => { %>
           <div class="product">
-            <a href="/product/<%= product.id %>">
+            <a href="/products/<%= product.id %>">
               <img src="<%= product.image || '/images/imagenes/fallback.png' %>" alt="<%= product.title %>">
               <div><%= product.title %></div>
               <span><%= product.price %> puntos</span>

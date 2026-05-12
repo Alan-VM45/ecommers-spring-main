@@ -28,6 +28,18 @@ function getProductDetail(req, res) {
   });
 }
 
+function getByCategory(req, res) {
+  const category = req.params.category;
+  const products = productModel.getProductsByCategory(category);
+  
+  res.render('category', {
+    category,
+    products,
+    cartCount: cartItemCount(req.session)
+  });
+}
+
 module.exports = {
-  getProductDetail
+  getProductDetail,
+  getByCategory
 };
