@@ -70,9 +70,16 @@ function postUpdateQuantity(req, res) {
   res.redirect('/cart');
 }
 
+function getCheckout(req, res) {
+  res.render('checkout', {
+    cartCount: cartItemCount(req.session)
+  });
+}
+
 module.exports = {
   getCartPage,
   postAddToCart,
   postRemoveFromCart,
-  postUpdateQuantity
+  postUpdateQuantity,
+  getCheckout
 };
