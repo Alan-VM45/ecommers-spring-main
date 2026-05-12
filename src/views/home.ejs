@@ -48,14 +48,13 @@
       <div class="promo">📺 50% OFF en HBO Max - Canjeando 50.000 puntos</div>
     </section>
 
-    <!-- Te puede interesar -->
     <section class="product-section">
       <h2>Te puede interesar</h2>
       <div class="product-grid">
         <% suggestedProducts.forEach(product => { %>
           <div class="product">
             <a href="/product/<%= product.id %>">
-              <img src="<%= product.image %>" alt="<%= product.title %>">
+              <img src="<%= product.image || '/images/imagenes/fallback.png' %>" alt="<%= product.title %>">
               <div><%= product.title %></div>
               <span><%= product.price %> puntos</span>
             </a>

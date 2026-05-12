@@ -46,7 +46,9 @@ function getTopProducts() {
 function getSuggestedProducts(product) {
   const products = getAllProducts();
   if (!product || !product.suggestions) {
-    return products.filter((item) => item.top).slice(0, 4);
+    // US #6: Retornar 5 productos aleatorios
+    const shuffled = [...products].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 5);
   }
   return products.filter((item) => product.suggestions.includes(item.id));
 }
