@@ -4,16 +4,26 @@ const { cartItemCount } = require('../models/cartModel');
 function getProductDetail(req, res) {
   const product = productModel.getProductById(req.params.id);
   if (!product) {
-    return res.status(404).render('404', {
+    return res.status(404).render('errors/404', {
       cartCount: cartItemCount(req.session)
     });
   }
 
-  const suggestions = productModel.getSuggestedProducts(product);
+  // US #8: Productos relacionados por categoría
+  let relatedProducts = [];
+  if (product.category) {
+    relatedProducts = productModel.getProductsByCategory(product.category)
+      .filter(p => p.id !== product.id); // No incluir el producto actual
+  }
+
+  // Si hay más de 4, seleccionar 4 al azar
+  if (relatedProducts.length > 4) {
+    relatedProducts = relatedProducts.sort(() => 0.5 - Math.random()).slice(0, 4);
+  }
 
   res.render('product', {
     product,
-    suggestions,
+    relatedProducts,
     cartCount: cartItemCount(req.session)
   });
 }

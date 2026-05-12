@@ -37,18 +37,23 @@
     </div>
   </main>
 
-  <!-- Productos sugeridos -->
+  <!-- Productos relacionados (US #8) -->
   <section class="sugerencias">
-    <h2>También podría interesarte</h2>
+    <h2>Productos relacionados</h2>
     <div class="product-grid">
-      <% suggestions.forEach(suggestion => { %>
-        <div class="product">
-          <a href="/product/<%= suggestion.id %>">
-            <img src="<%= suggestion.image %>" alt="<%= suggestion.title %>">
-            <div><%= suggestion.title %></div>
-          </a>
-        </div>
-      <% }); %>
+      <% if (relatedProducts && relatedProducts.length > 0) { %>
+        <% relatedProducts.forEach(related => { %>
+          <div class="product">
+            <a href="/product/<%= related.id %>">
+              <img src="<%= related.image || '/images/imagenes/fallback.png' %>" alt="<%= related.title %>">
+              <div><%= related.title %></div>
+              <span><%= related.price %> puntos</span>
+            </a>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <p class="no-related">No hay productos relacionados disponibles en este momento.</p>
+      <% } %>
     </div>
   </section>
 
