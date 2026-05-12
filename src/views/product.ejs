@@ -25,10 +25,11 @@
   <!-- Contenido principal del producto -->
   <main class="producto-detalle">
     <div class="imagen-producto">
-      <img src="<%= product.image %>" alt="<%= product.title %>">
+      <img src="<%= product.image || '/images/imagenes/fallback.png' %>" alt="<%= product.title %>">
     </div>
     <div class="info-producto">
       <h1><%= product.title %></h1>
+      <p class="category-tag">Categoría: <%= product.category %></p>
       <p><%= product.description %></p>
       <p><strong><%= product.price %> puntos</strong></p>
       <form action="/cart/add/<%= product.id %>" method="POST">
@@ -44,7 +45,7 @@
       <% if (relatedProducts && relatedProducts.length > 0) { %>
         <% relatedProducts.forEach(related => { %>
           <div class="product">
-            <a href="/product/<%= related.id %>">
+            <a href="/products/<%= related.id %>">
               <img src="<%= related.image || '/images/imagenes/fallback.png' %>" alt="<%= related.title %>">
               <div><%= related.title %></div>
               <span><%= related.price %> puntos</span>

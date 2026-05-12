@@ -44,7 +44,7 @@ app.use('/home', homeRoutes);
 app.use('/register', registerRoutes);
 app.use('/profile', profileRoutes);
 app.use('/cart', cartRoutes);
-app.use('/product', productRoutes);
+app.use('/products', productRoutes);
 
 // Middleware para errores 404 (US #2)
 app.use((req, res, next) => {
