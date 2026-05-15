@@ -1,21 +1,21 @@
-const productModel = require('../models/productModel');
-const { cartItemCount } = require('../models/cartModel');
+const productsService = require('../services/productsService');
+const cartService = require('../services/cartService');
 
 function getHome(req, res) {
   const category = req.query.category || '';
   const search = req.query.search || '';
 
-  let products = productModel.getAllProducts();
+  let products = productsService.getAllProducts();
   if (category) {
-    products = productModel.getProductsByCategory(category);
+    products = productsService.getProductsByCategory(category);
   }
   if (search) {
-    products = productModel.searchProducts(search);
+    products = productsService.searchProducts(search);
   }
 
-  const topProducts = productModel.getTopProducts();
-  const suggestedProducts = productModel.getSuggestedProducts();
-  const popularProducts = productModel.getTopProducts();
+  const topProducts = productsService.getTopProducts();
+  const suggestedProducts = productsService.getSuggestedProducts();
+  const popularProducts = productsService.getTopProducts();
 
   res.render('home', {
     products,
@@ -24,7 +24,7 @@ function getHome(req, res) {
     popularProducts,
     search,
     category,
-    cartCount: cartItemCount(req.session)
+    cartCount: cartService.getCartItemCount(req.session)
   });
 }
 

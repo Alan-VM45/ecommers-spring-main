@@ -1,41 +1,40 @@
-const productModel = require('../models/productModel');
-const { cartItemCount } = require('../models/cartModel');
+const productsService = require('../services/productsService');
+const cartService = require('../services/cartService');
 
 function getProductDetail(req, res) {
-  const product = productModel.getProductById(req.params.id);
+  // US #17: Validar y normalizar ID
+  const normalizedId = productsService.normalizeId(req.params.id);
+  if (!normalizedId.isValid) {
+    return res.status(400).render('errors/404', {
+      cartCount: cartService.getCartItemCount(req.session)
+    });
+  }
+
+  const product = productsService.getProductById(normalizedId.id);
   if (!product) {
     return res.status(404).render('errors/404', {
-      cartCount: cartItemCount(req.session)
+      cartCount: cartService.getCartItemCount(req.session)
     });
   }
 
   // US #8: Productos relacionados por categoría
-  let relatedProducts = [];
-  if (product.category) {
-    relatedProducts = productModel.getProductsByCategory(product.category)
-      .filter(p => p.id !== product.id); // No incluir el producto actual
-  }
-
-  // Si hay más de 4, seleccionar 4 al azar
-  if (relatedProducts.length > 4) {
-    relatedProducts = relatedProducts.sort(() => 0.5 - Math.random()).slice(0, 4);
-  }
+  const relatedProducts = productsService.getRelatedProducts(product, 4);
 
   res.render('product', {
     product,
     relatedProducts,
-    cartCount: cartItemCount(req.session)
+    cartCount: cartService.getCartItemCount(req.session)
   });
 }
 
 function getByCategory(req, res) {
   const category = req.params.category;
-  const products = productModel.getProductsByCategory(category);
+  const products = productsService.getProductsByCategory(category);
   
   res.render('category', {
     category,
     products,
-    cartCount: cartItemCount(req.session)
+    cartCount: cartService.getCartItemCount(req.session)
   });
 }
 

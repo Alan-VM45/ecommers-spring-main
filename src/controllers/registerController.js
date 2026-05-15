@@ -1,4 +1,4 @@
-const { cartItemCount } = require('../models/cartModel');
+const cartService = require('../services/cartService');
 // Podrías importar un userService aquí si quieres persistir en JSON, 
 // por ahora mantengo la lógica del usuario con las validaciones del Sprint 2.
 
@@ -6,7 +6,7 @@ function getRegister(req, res) {
   res.render('register', {
     errors: [],
     oldData: {},
-    cartCount: cartItemCount(req.session)
+    cartCount: cartService.getCartItemCount(req.session)
   });
 }
 
@@ -29,7 +29,7 @@ function postRegister(req, res) {
     return res.render('register', {
       errors,
       oldData: req.body,
-      cartCount: cartItemCount(req.session)
+      cartCount: cartService.getCartItemCount(req.session)
     });
   }
 

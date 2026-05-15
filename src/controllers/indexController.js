@@ -1,10 +1,10 @@
-const { cartItemCount } = require('../models/cartModel');
+const cartService = require('../services/cartService');
 
 function getLogin(req, res) {
   res.render('index', {
     error: null,
     username: '',
-    cartCount: cartItemCount(req.session)
+    cartCount: cartService.getCartItemCount(req.session)
   });
 }
 
@@ -23,7 +23,7 @@ function postLogin(req, res) {
     return res.render('index', {
       error: errors.join(' '),
       username,
-      cartCount: cartItemCount(req.session)
+      cartCount: cartService.getCartItemCount(req.session)
     });
   }
 
@@ -33,7 +33,7 @@ function postLogin(req, res) {
 
 function getProfile(req, res) {
   res.render('profile', {
-    cartCount: cartItemCount(req.session)
+    cartCount: cartService.getCartItemCount(req.session)
   });
 }
 

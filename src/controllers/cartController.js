@@ -1,67 +1,43 @@
-const productModel = require('../models/productModel');
-const {
-  addToCart,
-  removeFromCart,
-  updateQuantity,
-  getCart,
-  cartItemCount
-} = require('../models/cartModel');
+const productsService = require('../services/productsService');
+const cartService = require('../services/cartService');
 
-function buildCartItems(session) {
-  const rawCart = getCart(session);
-  return rawCart.map((item) => {
-    const product = productModel.getProductById(item.id);
-    return {
-      ...item,
-      product,
-      subtotal: product ? product.price * item.quantity : 0
-    };
-  });
-}
+
 
 function getCartPage(req, res) {
-  const cartItems = buildCartItems(req.session);
-  const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
+  const cartItems = cartService.buildCartItems(req.session);
+  const total = cartService.calculateTotal(req.session);
 
   res.render('cart', {
     cart: cartItems,
-    cartCount: cartItemCount(req.session),
+    cartCount: cartService.getCartItemCount(req.session),
     total,
     error: null
   });
 }
 
 function postAddToCart(req, res) {
-  const productId = Number(req.params.id);
-  const product = productModel.getProductById(productId);
-
-  if (!product) {
-    return res.status(404).render('errors/404', {
-      cartCount: cartItemCount(req.session)
+  // US #17: Validar y normalizar ID
+  const normalizedId = productsService.normalizeId(req.params.id);
+  if (!normalizedId.isValid) {
+    return res.status(400).render('errors/404', {
+      cartCount: cartService.getCartItemCount(req.session)
     });
   }
 
-  if (product.stock === 0) {
-    const relatedProducts = productModel.getProductsByCategory(product.category)
-      .filter(p => p.id !== product.id)
-      .slice(0, 4);
+  const product = productsService.getProductById(normalizedId.id);
+  if (!product) {
+    return res.status(404).render('errors/404', {
+      cartCount: cartService.getCartItemCount(req.session)
+    });
+  }
 
+  const result = cartService.addToCart(req.session, normalizedId.id);
+  if (result.error) {
+    const relatedProducts = productsService.getRelatedProducts(product, 4);
     return res.render('product', {
       product,
       relatedProducts,
-      cartCount: cartItemCount(req.session),
-      error: 'No se puede agregar al carrito porque el producto está sin stock.'
-    });
-  }
-
-  const result = addToCart(req.session, productId);
-  if (result.error) {
-    const cartItems = buildCartItems(req.session);
-    const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
-    return res.render('cart', {
-      cart: cartItems,
-      cartCount: cartItemCount(req.session),
-      total,
+      cartCount: cartService.getCartItemCount(req.session),
       error: result.error
     });
   }
@@ -70,20 +46,36 @@ function postAddToCart(req, res) {
 }
 
 function postRemoveFromCart(req, res) {
-  removeFromCart(req.session, Number(req.params.id));
+  const normalizedId = productsService.normalizeId(req.params.id);
+  if (normalizedId.isValid) {
+    cartService.removeFromCart(req.session, normalizedId.id);
+  }
   res.redirect('/cart');
 }
 
 function postUpdateQuantity(req, res) {
   const quantity = Number(req.body.quantity);
-  const result = updateQuantity(req.session, Number(req.params.id), quantity);
-
-  if (result.error) {
-    const cartItems = buildCartItems(req.session);
-    const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
+  const normalizedId = productsService.normalizeId(req.params.id);
+  
+  if (!normalizedId.isValid) {
+    const cartItems = cartService.buildCartItems(req.session);
+    const total = cartService.calculateTotal(req.session);
     return res.render('cart', {
       cart: cartItems,
-      cartCount: cartItemCount(req.session),
+      cartCount: cartService.getCartItemCount(req.session),
+      total,
+      error: 'ID de producto inválido.'
+    });
+  }
+
+  const result = cartService.updateQuantity(req.session, normalizedId.id, quantity);
+
+  if (result.error) {
+    const cartItems = cartService.buildCartItems(req.session);
+    const total = cartService.calculateTotal(req.session);
+    return res.render('cart', {
+      cart: cartItems,
+      cartCount: cartService.getCartItemCount(req.session),
       total,
       error: result.error
     });
@@ -94,7 +86,7 @@ function postUpdateQuantity(req, res) {
 
 function getCheckout(req, res) {
   res.render('checkout', {
-    cartCount: cartItemCount(req.session)
+    cartCount: cartService.getCartItemCount(req.session)
   });
 }
 
