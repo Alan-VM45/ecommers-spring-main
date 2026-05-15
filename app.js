@@ -53,6 +53,12 @@ app.use((req, res, next) => {
     res.status(404).render('errors/404');
 });
 
+// Middleware para errores 500 (US #13)
+app.use((err, req, res, next) => {
+    console.error('Error interno:', err);
+    res.status(500).render('500');
+});
+
 // Iniciar servidor
 app.listen(port, () => {
     console.log(`Servidor corriendo en http://localhost:${port}`);
