@@ -121,11 +121,26 @@ body {
   border-radius: 5px;
   text-decoration: none;
   font-size: 14px;
+  position: relative;
 }
 
 .cart-button:hover {
   background-color: #333;
 }
+
+.cart-count {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 2px 6px;
+  background-color: #e74c3c;
+  color: white;
+  border-radius: 10px;
+  font-size: 0.85em;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+}
+
 
 
 /* Alineación de usuario y carrito */
