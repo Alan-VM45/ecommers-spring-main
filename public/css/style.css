@@ -169,11 +169,49 @@ body {
 }
 
 .product {
+  position: relative;
   background-color: white;
   padding: 10px;
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.stock-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.stock-badge.out-of-stock {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.stock-badge.detalle {
+  position: static;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.product button:disabled,
+.cart-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #ccc;
+  color: #666;
+}
+
+.form-error {
+  color: #e74c3c;
+  font-weight: bold;
+  margin-bottom: 16px;
 }
 
 .product img {

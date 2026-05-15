@@ -53,6 +53,9 @@
       <div class="product-grid">
         <% suggestedProducts.forEach(product => { %>
           <div class="product">
+            <% if (product.stock === 0) { %>
+              <span class="stock-badge out-of-stock">Sin stock</span>
+            <% } %>
             <a href="/products/<%= product.id %>">
               <img src="<%= product.image || '/images/imagenes/fallback.png' %>" alt="<%= product.title %>">
               <div><%= product.title %></div>
@@ -69,6 +72,9 @@
       <div class="product-grid">
         <% popularProducts.forEach(product => { %>
           <div class="product">
+            <% if (product.stock === 0) { %>
+              <span class="stock-badge out-of-stock">Sin stock</span>
+            <% } %>
             <a href="/products/<%= product.id %>">
               <img src="<%= product.image || '/images/imagenes/fallback.png' %>" alt="<%= product.title %>">
               <div><%= product.title %></div>

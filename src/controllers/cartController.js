@@ -32,7 +32,29 @@ function getCartPage(req, res) {
 }
 
 function postAddToCart(req, res) {
-  const result = addToCart(req.session, Number(req.params.id));
+  const productId = Number(req.params.id);
+  const product = productModel.getProductById(productId);
+
+  if (!product) {
+    return res.status(404).render('errors/404', {
+      cartCount: cartItemCount(req.session)
+    });
+  }
+
+  if (product.stock === 0) {
+    const relatedProducts = productModel.getProductsByCategory(product.category)
+      .filter(p => p.id !== product.id)
+      .slice(0, 4);
+
+    return res.render('product', {
+      product,
+      relatedProducts,
+      cartCount: cartItemCount(req.session),
+      error: 'No se puede agregar al carrito porque el producto está sin stock.'
+    });
+  }
+
+  const result = addToCart(req.session, productId);
   if (result.error) {
     const cartItems = buildCartItems(req.session);
     const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);

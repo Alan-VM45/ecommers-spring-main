@@ -29,11 +29,17 @@
     </div>
     <div class="info-producto">
       <h1><%= product.title %></h1>
+      <% if (product.stock === 0) { %>
+        <span class="stock-badge out-of-stock detalle">Sin stock</span>
+      <% } %>
       <p class="category-tag">Categoría: <%= product.category %></p>
       <p><%= product.description %></p>
       <p><strong><%= product.price %> puntos</strong></p>
+      <% if (typeof error !== 'undefined' && error) { %>
+        <p class="form-error"><%= error %></p>
+      <% } %>
       <form action="/cart/add/<%= product.id %>" method="POST">
-        <button type="submit" class="cart-button">🛒 <span class="highlight">Añadir al Carrito</span></button>
+        <button type="submit" class="cart-button" <%= product.stock === 0 ? 'disabled' : '' %>>🛒 <span class="highlight">Añadir al Carrito</span></button>
       </form>
     </div>
   </main>
