@@ -1,5 +1,6 @@
 const fs = require('fs');
-const path = require('sqlite3').verbose();
+const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
 
 const db = new sqlite3.Database(path.join(__dirname, '../db/database.sqlite'), (err) => {
   if (err) {
@@ -14,7 +15,7 @@ fs.readFile('./src/data/products.json', 'utf8', (err, data) => {
     db.close();
     process.exit(1);
   }
-});
+ 
 
   try {
     const products = JSON.parse(data);
@@ -23,7 +24,7 @@ fs.readFile('./src/data/products.json', 'utf8', (err, data) => {
       db.close();
       process.exit(1);
     }
-  }
+ 
 
   const sql = 'INSERT INTO products (id, title, price, description, category, image) VALUES (?, ?, ?, ?, ?, ?)';
 
@@ -37,16 +38,29 @@ fs.readFile('./src/data/products.json', 'utf8', (err, data) => {
     });
     stmt.finalize();
   });
+});
 
     console.log('Productos insertados correctamente');
-    fs.unlink('./src/data/products.json', (err)=>{
-        if(err) console.error('Error al eliminar el archivo JSON:', err.message);
-        else console.log('Archivo JSON eliminado correctamente');
+    db.close((err)=>{
+      if(err){
+        console.error('Error al cerrar la base de datos:', err.message);
+      } else {
+        fs.unlink('./src/data/products.json', (err) => {
+          if (err) {
+            console.error('Error al eliminar el archivo JSON:', err.message);
+          } else {
+            console.log('Archivo JSON eliminado correctamente');
+          }        
+        });
+      }
     });
- catch (parseError) {
+  } catch (parseError) {
     console.error('Error al parsear el archivo JSON:', parseError.message);
     db.close();
     }
 });
+
+
+
 
 
