@@ -1,7 +1,8 @@
-const fs = require('fs');
 const path = require('path');
+const Database = require('better-sqlite3');
 
-const productsFilePath = path.join(__dirname, '../data/products.json');
+const dbPath = path.join(__dirname, '../../db/database.sqlite');
+const db = new Database(dbPath);
 
 /**
  * Normaliza y valida un ID de producto
@@ -27,11 +28,15 @@ function normalizeId(id) {
 }
 
 /**
- * Lee todos los productos del archivo JSON
+ * Lee todos los productos de la base de datos SQLite
  */
 function getAllProducts() {
-  const productsJSON = fs.readFileSync(productsFilePath, 'utf-8');
-  return JSON.parse(productsJSON);
+  const products = db.prepare('SELECT * FROM products').all();
+  // Convertimos 'suggestions' de string JSON a array si es necesario
+  return products.map(product => ({
+    ...product,
+    suggestions: product.suggestions ? JSON.parse(product.suggestions) : []
+  }));
 }
 
 /**

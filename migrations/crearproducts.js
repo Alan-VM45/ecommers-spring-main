@@ -26,34 +26,40 @@ fs.readFile('./src/data/products.json', 'utf8', (err, data) => {
     }
  
 
-  const sql = 'INSERT INTO products (id, title, price, description, category, image) VALUES (?, ?, ?, ?, ?, ?)';
+  const sql = 'INSERT INTO products (id, title, price, description, category, image, stock, top, suggestions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-  db.serialize(()=>{
+  db.serialize(() => {
     const stmt = db.prepare(sql);
     products.forEach((product) => {
-        stmt.run(product.id, product.title, product.price, product.description, product.category, product.image, (err) => {
-            if (err) {
-                console.error('Error al insertar producto:', err.message);
-            }
+      stmt.run(
+        product.id,
+        product.title,
+        product.price,
+        product.description,
+        product.category,
+        product.image,
+        product.stock || 0,
+        product.top ? 1 : 0,
+        JSON.stringify(product.suggestions || []),
+        (err) => {
+          if (err) {
+            console.error(`Error al insertar producto ${product.id}:`, err.message);
+          }
+        }
+      );
     });
     stmt.finalize();
-  });
-});
 
-    console.log('Productos insertados correctamente');
-    db.close((err)=>{
-      if(err){
+    db.close((err) => {
+      if (err) {
         console.error('Error al cerrar la base de datos:', err.message);
       } else {
-        fs.unlink('./src/data/products.json', (err) => {
-          if (err) {
-            console.error('Error al eliminar el archivo JSON:', err.message);
-          } else {
-            console.log('Archivo JSON eliminado correctamente');
-          }        
-        });
+        console.log('Productos insertados correctamente con todos sus campos.');
+        console.log('Puedes eliminar el archivo JSON manualmente una vez verifiques los datos.');
+        // fs.unlink('./src/data/products.json', (err) => { ... });
       }
     });
+  });
   } catch (parseError) {
     console.error('Error al parsear el archivo JSON:', parseError.message);
     db.close();
