@@ -5,13 +5,7 @@ function getHome(req, res) {
   const category = req.query.category || '';
   const search = req.query.search || '';
 
-  let products = productsService.getAllProducts();
-  if (category) {
-    products = productsService.getProductsByCategory(category);
-  }
-  if (search) {
-    products = productsService.searchProducts(search);
-  }
+  const products = productsService.getFilteredProducts({ search, category });
 
   const topProducts = productsService.getTopProducts();
   const suggestedProducts = productsService.getSuggestedProducts();

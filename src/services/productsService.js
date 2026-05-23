@@ -1,8 +1,7 @@
+const fs = require('fs');
 const path = require('path');
-const Database = require('better-sqlite3');
 
-const dbPath = path.join(__dirname, '../../db/database.sqlite');
-const db = new Database(dbPath);
+const productsFilePath = path.join(__dirname, '../data/products.json');
 
 /**
  * Normaliza y valida un ID de producto
@@ -28,15 +27,16 @@ function normalizeId(id) {
 }
 
 /**
- * Lee todos los productos de la base de datos SQLite
+ * Lee todos los productos del archivo JSON
  */
 function getAllProducts() {
-  const products = db.prepare('SELECT * FROM products').all();
-  // Convertimos 'suggestions' de string JSON a array si es necesario
-  return products.map(product => ({
-    ...product,
-    suggestions: product.suggestions ? JSON.parse(product.suggestions) : []
-  }));
+  try {
+    const productsJSON = fs.readFileSync(productsFilePath, 'utf-8');
+    return JSON.parse(productsJSON);
+  } catch (error) {
+    console.error('Error al leer el archivo de productos:', error);
+    return [];
+  }
 }
 
 /**
@@ -82,6 +82,30 @@ function getProductsByCategory(category) {
   }
   
   return products.filter((product) => product.category.toLowerCase() === normalized);
+}
+
+/**
+ * Obtiene productos filtrados por búsqueda y categoría
+ * @param {object} filters - Filtros a aplicar { search, category }
+ */
+function getFilteredProducts({ search, category }) {
+  let products = getAllProducts();
+  
+  if (category) {
+    const normalizedCategory = String(category).trim().toLowerCase();
+    products = products.filter(product => product.category.toLowerCase() === normalizedCategory);
+  }
+  
+  if (search) {
+    const searchTerm = String(search).trim().toLowerCase();
+    products = products.filter(product => 
+      product.title.toLowerCase().includes(searchTerm) ||
+      product.description.toLowerCase().includes(searchTerm) ||
+      product.category.toLowerCase().includes(searchTerm)
+    );
+  }
+  
+  return products;
 }
 
 /**
@@ -142,7 +166,9 @@ module.exports = {
   getProductById,
   searchProducts,
   getProductsByCategory,
+  getFilteredProducts,
   getTopProducts,
   getSuggestedProducts,
   getRelatedProducts
 };
+
