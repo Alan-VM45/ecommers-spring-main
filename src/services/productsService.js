@@ -160,6 +160,25 @@ function getRelatedProducts(product, limit = 4) {
   return related;
 }
 
+/**
+ * Ordena productos por precio
+ * @param {array} products - Array de productos a ordenar
+ * @param {string} direction - 'asc' para ascendente, 'desc' para descendente
+ */
+function sortByPrice(products, direction = 'asc') {
+  if (!Array.isArray(products) || products.length === 0) {
+    return products;
+  }
+  
+  const normalized = String(direction || 'asc').toLowerCase().trim();
+  
+  if (normalized === 'desc') {
+    return [...products].sort((a, b) => b.price - a.price);
+  }
+  
+  return [...products].sort((a, b) => a.price - b.price);
+}
+
 module.exports = {
   normalizeId,
   getAllProducts,
@@ -169,6 +188,7 @@ module.exports = {
   getFilteredProducts,
   getTopProducts,
   getSuggestedProducts,
-  getRelatedProducts
+  getRelatedProducts,
+  sortByPrice
 };
 
