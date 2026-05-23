@@ -1,6 +1,6 @@
 -- db/schema.sql
-CREATE TABLE products (
-  id INTEGER PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS products (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
   image TEXT,
   description TEXT,
@@ -11,31 +11,33 @@ CREATE TABLE products (
   suggestions TEXT
 );
 
-CREATE TABLE categories (
-  id INTEGER PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS categories (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE users (
-  id INTEGER PRIMARY KEY,
-  username TEXT,
-  email TEXT
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE orders (
-  id INTEGER PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS orders (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER,
-  created_at TEXT,
-  status TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  status TEXT DEFAULT 'pending',
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
-CREATE TABLE order_items (
-  id INTEGER PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS order_items (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   order_id INTEGER,
   product_id INTEGER,
-  quantity INTEGER,
-  price INTEGER,
+  quantity INTEGER NOT NULL,
+  price INTEGER NOT NULL,
   FOREIGN KEY(order_id) REFERENCES orders(id),
   FOREIGN KEY(product_id) REFERENCES products(id)
 );
