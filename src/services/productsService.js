@@ -1,12 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-
-const productsFilePath = path.join(__dirname, '../data/products.json');
+const db = require('../../db/database');
 
 /**
- * Normaliza y valida un ID de producto
+ * Normaliza y valida un ID de producto contra la base de datos.
  * @param {*} id - ID a normalizar
- * @returns {object} { isValid: boolean, id: number|null, error: string|null }
+ * @returns {object} { isValid: boolean, id: number|null, statusCode: number, error: string|null }
  */
 function normalizeId(id) {
   const numId = Number(id);
@@ -15,133 +12,223 @@ function normalizeId(id) {
     return {
       isValid: false,
       id: null,
+      statusCode: 400,
       error: 'El ID debe ser un número válido y positivo.'
+    };
+  }
+  
+  // Validar si existe en la base de datos
+  try {
+    const productExists = db.prepare('SELECT 1 FROM products WHERE id = ?').get(numId);
+    if (!productExists) {
+      return {
+        isValid: false,
+        id: null,
+        statusCode: 404,
+        error: 'El producto no existe.'
+      };
+    }
+  } catch (error) {
+    console.error('Error al validar ID en BD:', error);
+    return {
+      isValid: false,
+      id: null,
+      statusCode: 500,
+      error: 'Error interno de la base de datos.'
     };
   }
   
   return {
     isValid: true,
     id: numId,
+    statusCode: 200,
     error: null
   };
 }
 
 /**
- * Lee todos los productos del archivo JSON
+ * Lee todos los productos de la base de datos SQLite
  */
 function getAllProducts() {
   try {
-    const productsJSON = fs.readFileSync(productsFilePath, 'utf-8');
-    return JSON.parse(productsJSON);
+    const stmt = db.prepare('SELECT * FROM products');
+    const rows = stmt.all();
+    return rows.map(r => ({
+      ...r,
+      top: r.top === 1 || r.top === true,
+      suggestions: JSON.parse(r.suggestions || '[]')
+    }));
   } catch (error) {
-    console.error('Error al leer el archivo de productos:', error);
+    console.error('Error al obtener productos de SQLite:', error);
     return [];
   }
 }
 
 /**
- * Obtiene un producto por ID
+ * Obtiene un producto por ID desde SQLite
  * @param {number} id - ID del producto
  */
 function getProductById(id) {
-  const products = getAllProducts();
-  return products.find((product) => product.id === id);
+  try {
+    const stmt = db.prepare('SELECT * FROM products WHERE id = ?');
+    const row = stmt.get(id);
+    if (!row) return null;
+    return {
+      ...row,
+      top: row.top === 1 || row.top === true,
+      suggestions: JSON.parse(row.suggestions || '[]')
+    };
+  } catch (error) {
+    console.error('Error al obtener producto por ID desde SQLite:', error);
+    return null;
+  }
 }
 
 /**
- * Busca productos por término
+ * Busca productos por término usando SQL LIKE
  * @param {string} term - Término de búsqueda
  */
 function searchProducts(term) {
-  const products = getAllProducts();
-  const searchTerm = String(term || '').trim().toLowerCase();
-  
+  const searchTerm = String(term || '').trim();
   if (searchTerm === '') {
-    return products;
+    return getAllProducts();
   }
-  
-  return products.filter((product) => {
-    return (
-      product.title.toLowerCase().includes(searchTerm) ||
-      product.description.toLowerCase().includes(searchTerm) ||
-      product.category.toLowerCase().includes(searchTerm)
-    );
-  });
+  try {
+    const wild = `%${searchTerm}%`;
+    const stmt = db.prepare(`
+      SELECT * FROM products 
+      WHERE title LIKE ? OR description LIKE ? OR category LIKE ?
+    `);
+    const rows = stmt.all(wild, wild, wild);
+    return rows.map(r => ({
+      ...r,
+      top: r.top === 1 || r.top === true,
+      suggestions: JSON.parse(r.suggestions || '[]')
+    }));
+  } catch (error) {
+    console.error('Error al buscar productos en SQLite:', error);
+    return [];
+  }
 }
 
 /**
- * Obtiene productos por categoría
+ * Obtiene productos por categoría desde SQLite
  * @param {string} category - Nombre de la categoría
  */
 function getProductsByCategory(category) {
-  const products = getAllProducts();
-  const normalized = String(category || '').trim().toLowerCase();
-  
+  const normalized = String(category || '').trim();
   if (!normalized) {
-    return products;
+    return getAllProducts();
   }
-  
-  return products.filter((product) => product.category.toLowerCase() === normalized);
+  try {
+    const stmt = db.prepare('SELECT * FROM products WHERE LOWER(category) = LOWER(?)');
+    const rows = stmt.all(normalized);
+    return rows.map(r => ({
+      ...r,
+      top: r.top === 1 || r.top === true,
+      suggestions: JSON.parse(r.suggestions || '[]')
+    }));
+  } catch (error) {
+    console.error('Error al obtener productos por categoría en SQLite:', error);
+    return [];
+  }
 }
 
 /**
- * Obtiene productos filtrados por búsqueda y categoría
+ * Obtiene productos filtrados por búsqueda y categoría usando SQL
  * @param {object} filters - Filtros a aplicar { search, category }
  */
 function getFilteredProducts({ search, category }) {
-  let products = getAllProducts();
-  
-  if (category) {
-    const normalizedCategory = String(category).trim().toLowerCase();
-    products = products.filter(product => product.category.toLowerCase() === normalizedCategory);
+  try {
+    let sql = 'SELECT * FROM products WHERE 1=1';
+    const params = [];
+    
+    if (category) {
+      sql += ' AND LOWER(category) = LOWER(?)';
+      params.push(String(category).trim());
+    }
+    
+    if (search) {
+      sql += ' AND (title LIKE ? OR description LIKE ? OR category LIKE ?)';
+      const wild = `%${String(search).trim()}%`;
+      params.push(wild, wild, wild);
+    }
+    
+    const stmt = db.prepare(sql);
+    const rows = stmt.all(...params);
+    return rows.map(r => ({
+      ...r,
+      top: r.top === 1 || r.top === true,
+      suggestions: JSON.parse(r.suggestions || '[]')
+    }));
+  } catch (error) {
+    console.error('Error al obtener productos filtrados en SQLite:', error);
+    return [];
   }
-  
-  if (search) {
-    const searchTerm = String(search).trim().toLowerCase();
-    products = products.filter(product => 
-      product.title.toLowerCase().includes(searchTerm) ||
-      product.description.toLowerCase().includes(searchTerm) ||
-      product.category.toLowerCase().includes(searchTerm)
-    );
-  }
-  
-  return products;
 }
 
 /**
- * Obtiene los top 10 productos
+ * Obtiene los top 10 productos desde SQLite
  */
 function getTopProducts() {
-  const products = getAllProducts();
-  const topProducts = products.filter((product) => product.top);
-  
-  if (topProducts.length >= 10) {
-    return topProducts.slice(0, 10);
+  try {
+    const topStmt = db.prepare('SELECT * FROM products WHERE top = 1');
+    const topRows = topStmt.all().map(r => ({
+      ...r,
+      top: true,
+      suggestions: JSON.parse(r.suggestions || '[]')
+    }));
+    
+    if (topRows.length >= 10) {
+      return topRows.slice(0, 10);
+    }
+    
+    const otherStmt = db.prepare('SELECT * FROM products WHERE top = 0 ORDER BY RANDOM()');
+    const otherRows = otherStmt.all().map(r => ({
+      ...r,
+      top: false,
+      suggestions: JSON.parse(r.suggestions || '[]')
+    }));
+    
+    return [...topRows, ...otherRows].slice(0, 10);
+  } catch (error) {
+    console.error('Error al obtener top products de SQLite:', error);
+    return [];
   }
-  
-  const otherProducts = products.filter((product) => !product.top);
-  const shuffledOthers = otherProducts.sort(() => 0.5 - Math.random());
-  
-  return [...topProducts, ...shuffledOthers].slice(0, 10);
 }
 
 /**
- * Obtiene productos sugeridos
+ * Obtiene productos sugeridos desde SQLite
  * @param {object} product - Producto del cual obtener sugerencias
  */
 function getSuggestedProducts(product) {
-  const products = getAllProducts();
-  
-  if (!product || !product.suggestions) {
-    const shuffled = [...products].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 5);
+  try {
+    if (!product || !product.suggestions || !Array.isArray(product.suggestions) || product.suggestions.length === 0) {
+      const stmt = db.prepare('SELECT * FROM products ORDER BY RANDOM() LIMIT 5');
+      const rows = stmt.all();
+      return rows.map(r => ({
+        ...r,
+        top: r.top === 1 || r.top === true,
+        suggestions: JSON.parse(r.suggestions || '[]')
+      }));
+    }
+    
+    const placeholders = product.suggestions.map(() => '?').join(',');
+    const stmt = db.prepare(`SELECT * FROM products WHERE id IN (${placeholders})`);
+    const rows = stmt.all(...product.suggestions);
+    return rows.map(r => ({
+      ...r,
+      top: r.top === 1 || r.top === true,
+      suggestions: JSON.parse(r.suggestions || '[]')
+    }));
+  } catch (error) {
+    console.error('Error al obtener sugerencias en SQLite:', error);
+    return [];
   }
-  
-  return products.filter((item) => product.suggestions.includes(item.id));
 }
 
 /**
- * Obtiene productos relacionados por categoría
+ * Obtiene productos relacionados por categoría usando SQLite RANDOM()
  * @param {object} product - Producto del cual obtener relacionados
  * @param {number} limit - Límite de productos (default 4)
  */
@@ -149,15 +236,18 @@ function getRelatedProducts(product, limit = 4) {
   if (!product || !product.category) {
     return [];
   }
-  
-  const related = getProductsByCategory(product.category)
-    .filter(p => p.id !== product.id);
-  
-  if (related.length > limit) {
-    return related.sort(() => 0.5 - Math.random()).slice(0, limit);
+  try {
+    const stmt = db.prepare('SELECT * FROM products WHERE LOWER(category) = LOWER(?) AND id <> ? ORDER BY RANDOM() LIMIT ?');
+    const rows = stmt.all(product.category, product.id, limit);
+    return rows.map(r => ({
+      ...r,
+      top: r.top === 1 || r.top === true,
+      suggestions: JSON.parse(r.suggestions || '[]')
+    }));
+  } catch (error) {
+    console.error('Error al obtener relacionados en SQLite:', error);
+    return [];
   }
-  
-  return related;
 }
 
 /**
@@ -191,4 +281,3 @@ module.exports = {
   getRelatedProducts,
   sortByPrice
 };
-
