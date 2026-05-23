@@ -16,21 +16,15 @@ function getCartPage(req, res) {
 }
 
 function postAddToCart(req, res) {
-  // US #17: Validar y normalizar ID
+  // US #17: Validar y normalizar ID y existencia
   const normalizedId = productsService.normalizeId(req.params.id);
   if (!normalizedId.isValid) {
-    return res.status(400).render('errors/404', {
+    return res.status(normalizedId.statusCode).render('errors/404', {
       cartCount: cartService.getCartItemCount(req.session)
     });
   }
 
   const product = productsService.getProductById(normalizedId.id);
-  if (!product) {
-    return res.status(404).render('errors/404', {
-      cartCount: cartService.getCartItemCount(req.session)
-    });
-  }
-
   const result = cartService.addToCart(req.session, normalizedId.id);
   if (result.error) {
     const relatedProducts = productsService.getRelatedProducts(product, 4);
