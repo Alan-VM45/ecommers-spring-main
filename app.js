@@ -39,6 +39,7 @@ const profileRoutes = require('./src/routes/profile');
 const cartRoutes = require('./src/routes/cart');
 const productRoutes = require('./src/routes/product');
 const categoryRoutes = require('./src/routes/category');
+const searchRoutes = require('./src/routes/search');
 
 app.use('/', indexRoutes);
 app.use('/home', homeRoutes);
@@ -47,6 +48,7 @@ app.use('/profile', profileRoutes);
 app.use('/cart', cartRoutes);
 app.use('/products', productRoutes);
 app.use('/categories', categoryRoutes);
+app.use('/search', searchRoutes);
 
 // Middleware para errores 404 (US #2)
 app.use((req, res, next) => {

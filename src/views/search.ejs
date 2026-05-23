@@ -3,23 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MiEcommerce</title>
+  <title>Búsqueda - MiEcommerce</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-
-
 
   <!-- Contenido de la tienda -->
   <div id="main-content">
 
 <!-- Barra superior -->
 <header class="top-bar">
-  <div class="logo">MiE<span class="highlight">commerce</span></div>
+  <div class="logo"><a href="/home" style="text-decoration: none; color: inherit;">MiE<span class="highlight">commerce</span></a></div>
 
   <div class="search-container">
   <form method="GET" action="/search" style="display: flex; width: 100%;">
-    <input type="text" name="query" placeholder="Buscar productos..." class="search-bar" required>
+    <input type="text" name="query" placeholder="Buscar productos..." class="search-bar" value="<%= query %>" required>
     <button type="submit" class="search-button" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">🔍</button>
   </form>
 </div>
@@ -30,7 +28,6 @@
     <a href="/cart" class="cart-button">🛒 <span class="highlight">Carrito</span> <span class="cart-count"><%= cartCount %></span></a>
   </div>
 </header>
-
 
     <!-- Categorías -->
     <nav class="categories">
@@ -44,47 +41,32 @@
       <a href="/categories/otros" class="category">🎁<br>Otros</a>
     </nav>
 
-    <!-- Promociones -->
-    <section class="promotions">
-      <div class="promo">🎬 50% OFF en Combo Plus - Canjeando 50.000 puntos</div>
-      <div class="promo">📺 50% OFF en HBO Max - Canjeando 50.000 puntos</div>
-    </section>
-
+    <!-- Sección de resultados de búsqueda -->
     <section class="product-section">
-      <h2>Te puede interesar</h2>
-      <div class="product-grid">
-        <% suggestedProducts.forEach(product => { %>
-          <div class="product">
-            <% if (product.stock === 0) { %>
-              <span class="stock-badge out-of-stock">Sin stock</span>
-            <% } %>
-            <a href="/products/<%= product.id %>">
-              <img src="<%= product.image || '/images/imagenes/fallback.png' %>" alt="<%= product.title %>">
-              <div><%= product.title %></div>
-              <span><%= product.price %> puntos</span>
-            </a>
-          </div>
-        <% }); %>
-      </div>
-    </section>
-
-    <!-- Los más pedidos -->
-    <section class="product-section">
-      <h2>Los más pedidos</h2>
-      <div class="product-grid">
-        <% popularProducts.forEach(product => { %>
-          <div class="product">
-            <% if (product.stock === 0) { %>
-              <span class="stock-badge out-of-stock">Sin stock</span>
-            <% } %>
-            <a href="/products/<%= product.id %>">
-              <img src="<%= product.image || '/images/imagenes/fallback.png' %>" alt="<%= product.title %>">
-              <div><%= product.title %></div>
-              <span><%= product.price %> puntos</span>
-            </a>
-          </div>
-        <% }); %>
-      </div>
+      <h2>Resultados de búsqueda: "<%= query %>"</h2>
+      
+      <% if (results.length === 0) { %>
+        <div class="no-results">
+          <p>No encontramos productos que coincidan con "<%= query %>".</p>
+          <p>Por favor, intenta con otros términos o explora nuestras categorías.</p>
+        </div>
+      <% } else { %>
+        <p style="margin-bottom: 20px; color: #666;">Se encontraron <%= resultCount %> producto(s)</p>
+        <div class="product-grid">
+          <% results.forEach(product => { %>
+            <div class="product">
+              <% if (product.stock === 0) { %>
+                <span class="stock-badge out-of-stock">Sin stock</span>
+              <% } %>
+              <a href="/products/<%= product.id %>">
+                <img src="<%= product.image || '/images/imagenes/fallback.png' %>" alt="<%= product.title %>">
+                <div><%= product.title %></div>
+                <span><%= product.price %> puntos</span>
+              </a>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
     </section>
 
     <!-- Footer -->
